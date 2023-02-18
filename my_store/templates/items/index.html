@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% load mathfilters %}
+{% load thumbnail %}
+{% load static %}
+{% block header %}
+<div class="container">
+<h1> Добро пожаловать в <span style="color:red">My</span>store </h1>
+</div>
+<div id="loader" style="display:none;"></div>
+{% endblock %}
+{% block content %}
+<div class="container">
+      <div class="pricing-wrapper">
+         <div class="pricing-tables">
+    
+            {% for item in items %}
+    
+            <div class="pricing-item">
+               <div class="item-inner">
+                  <div class="item-header">
+                     <div class="title">
+                        <b>{{ item.name }}</b>
+                        <span style="padding-right: 10px;">{{ item.description }}</span>
+                     </div>
+                     <div class="price">
+                        <b>{{ item.price|div:100 }} {{ item.currency }}</b>
+                     </div>
+                  </div>
+                  <ul class="features">
+                    {% thumbnail item.image "300x300" crop="center" upscale=True padding=True as im %}
+                    <img class="card-img my-2" src="{{ im.url }}">
+                    {% endthumbnail %}
+                  </ul>
+                  <button class="pricing-button" onclick="buttonClicked( {{item.id}} )">Купить</button>
+               </div>
+            </div>
+            {% endfor %}
+            </div>
+         </div>
+    </div>
+    <script src="https://js.stripe.com/v3/"></script>
+    <script >
+        function buttonClicked(id) {
+        document.getElementById("loader").style.display = "block";
+        var stripe = Stripe('pk_test_51McmURHPSX0IITFPYrOEsqlHIjz7xhXjwCrZMQHh1JMsduhzuOK8cV3oCrohClZeQP0asfUV3WtuT4pmRFWlhDUa00IhibWiFY');
+        fetch(`/buy/${id}`, {method: 'GET'})
+        .then(response => response.json())
+        .then(session => stripe.redirectToCheckout({ sessionId: session.session_id.id }));
+        };
+    </script>
+{% endblock %}

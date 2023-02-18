@@ -1,0 +1,31 @@
+<!DOCTYPE html> 
+<html lang="ru"> 
+  <head>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}" /> 
+    
+    <meta charset="utf-8"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="msapplication-TileColor" content="#000">
+    <meta name="theme-color" content="#ffffff">
+    <title>
+      {% block title %}
+      <!-- Здесь будет заголовок страницы -->
+      {% endblock title %}
+    </title>
+  </head>
+  <body>
+    <header>
+      {% block header %}   
+      <!-- Здесь будет заголовок содержания страницы -->
+      {% endblock header %}
+
+    </header>
+    <main> 
+        {% block content %}
+        <!-- Основное наполнение страницы --> 
+        {% endblock content %}
+    </main>        
+      {% include 'includes/footer.html' %}   
+  </body>
+</html>
