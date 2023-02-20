@@ -12,7 +12,3 @@ def index(request):
     }
 
     return render(request, template, context)
-
-
-def product_detail(requset):
-    pass
