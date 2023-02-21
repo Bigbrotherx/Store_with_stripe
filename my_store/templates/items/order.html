@@ -55,15 +55,15 @@
     <script >
          const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
          var stripe = Stripe('pk_test_51McmURHPSX0IITFPYrOEsqlHIjz7xhXjwCrZMQHh1JMsduhzuOK8cV3oCrohClZeQP0asfUV3WtuT4pmRFWlhDUa00IhibWiFY');
-         
+         const headers = { 
+               "Content-Type": "application/json",
+               "X-CSRFToken": csrftoken,
+            };
          function orderButtonClicked() {
             document.getElementById("loader").style.display = "block";
             const requestOptions = {
                method: "GET",
-               headers: { 
-                  "Content-Type": "application/json",
-                  "X-CSRFToken": csrftoken,
-               },
+               headers: headers,
             };
             fetch("/buy/order/", requestOptions)
             .then(response => response.json())
@@ -73,10 +73,7 @@
          const promo = document.getElementById('promo')
          const requestOptions = {
             method: "PATCH",
-            headers: { 
-               "Content-Type": "application/json",
-               "X-CSRFToken": csrftoken,
-            },
+            headers: headers,
             body: JSON.stringify({
                promo_code: promo.value,
             }),
