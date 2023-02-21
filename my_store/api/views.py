@@ -42,11 +42,13 @@ def add_promo_to_order(request):
                 status=status.HTTP_200_OK
             )
         else:
-
+            order.discount = None
+            order.save(update_fields=['discount'])
             return Response(
                 {'Message': 'Promocod do not exists'},
                 status=status.HTTP_404_NOT_FOUND
             )
+
 
 @api_view(['POST', 'GET', ])
 def create_an_order(request):
