@@ -11,12 +11,14 @@
 ## Инструкция по установке
 
 1. Установить вирутальное окружение:
+
    * Пример для Linux
 
    ```python
      $  python3.9 -m pip install venv venv
    ```
 2. Активировать окруженин и установить требующиеся зависимости:
+
    * Пример для Linux
 
    ```python
@@ -24,11 +26,24 @@
      (venv)$ pip install -r requiments.txt
    ```
 3. Запустить сервер
+
    * Пример для Linux
 
    ```python
      <project_dir>store_with_stripe/my_store(venv)$ python manage.py runserver
    ```
+
+## Запуск в контейнере Docker
+
+1. Выполните команду
+
+   ```bash
+   docker-compose up -в
+   ```
+
+  2. Сервер доступен в вашем web браузере по адресу:
+
+      [localhost](http://localhost:8000/)
 
 ## Администрирование
 
