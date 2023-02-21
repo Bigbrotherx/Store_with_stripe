@@ -24,25 +24,46 @@ class ItemsView(APIView):
         return Response({'session_id': session_id}, status=status.HTTP_200_OK)
 
 
+@api_view(['PATCH', ])
+def add_promo_to_order(request):
+    """View функция для изменения Order"""
+    if request.method == 'PATCH':
+        promocode = request.data.get('promo_code')
+        discount = Discount.objects.filter(code=promocode)
+        order = Order.objects.all().last()
+        if discount.exists():
+            chosen_discount = discount.first()
+            get_create_coupons_id(chosen_discount)
+            order.discount = chosen_discount
+            order.save(update_fields=['discount'])
+
+            return Response(
+                {'Message': 'Promocod was found'},
+                status=status.HTTP_200_OK
+            )
+        else:
+
+            return Response(
+                {'Message': 'Promocod do not exists'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
 @api_view(['POST', 'GET', ])
 def create_an_order(request):
     """View функция для сохранения Order"""
     if request.method == 'POST':
         list_of_ids = request.data.get('order_items')
-        promocode = request.data.get('promo_code')
-        discount = Discount.objects.filter(code=promocode)
         order = Order()
-        if discount.exists():
-            chosen_discount = discount.first()
-            discount_id = get_create_coupons_id(chosen_discount)
-            order.discount = chosen_discount
         order.save()
         if len(list_of_ids):
             for id in list_of_ids:
                 item = get_object_or_404(Item, id=id)
                 order.items.add(item)
 
-            return Response({'session_id': 1}, status=status.HTTP_200_OK)
+            return Response(
+                {'Order creation status': 'Success'},
+                status=status.HTTP_200_OK
+            )
 
         return Response(
             {'Error_message': 'No items in order!'},
@@ -53,7 +74,9 @@ def create_an_order(request):
         """View функция получения сессии оплаты работает с последним заказом"""
         order = Order.objects.all().last()
         items = Item.objects.filter(order=order)
-        discount_id = order.discount.discount_id
+        discount_id = None
+        if order.discount:
+            discount_id = order.discount.discount_id
         list_of_items = []
         for item in items:
             create_product_id(item)

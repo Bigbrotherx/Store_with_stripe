@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% load mathfilters %}
+{% load thumbnail %}
+{% load static %}
+{% block title %}
+   Ваш заказ
+{% endblock %}
+{% block header %}
+<div id="loader" style="display:none;"></div>
+<div class="container">
+<h1> 
+   Ваш заказ
+</h1>
+</div>
+<div class="with_button">
+</div>
+<div id="loader" style="display:none;"></div>
+{% endblock %}
+{% block content %}
+{% csrf_token %}
+
+   <div class="container">
+    <div class="pricing-wrapper">
+        <div class="pricing-tables" style="justify-content: center">
+            <div class="order-item">
+               <div class="item-inner">
+
+                 <ol class="my-features">
+                  {% for item in order.items.all %}
+                   <li>{{ item.name }}<span style="float: right">{{ item.price|div:100 }} {{ item.currency }}</span></li>
+                  {% endfor %}
+                  </ol>
+
+                  <hr class="my-4" />
+                  <ul class="my-features">
+                   <li>Итоговая цена <span style="float: right">{{ total_price|div:100 }} {{ order.items.first.currency }}</span></li>
+                  </ul>
+                 <div class="button">
+                     <input id='promo' class="pricing-input" placeholder="Есть промокод?"/>
+                     <button id="order" class="order-button" onclick="promoButtonClicked()">
+                        Применить
+                     </button>
+                     <button id="order" class="order-button" onclick="orderButtonClicked()">
+                        Оплатить
+                     </button>
+                  </div>
+               </div>
+            </div>
+        </div>
+   </div>
+</div>
+
+    <script src="https://js.stripe.com/v3/"></script>
+    <script >
+         const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+         var stripe = Stripe('pk_test_51McmURHPSX0IITFPYrOEsqlHIjz7xhXjwCrZMQHh1JMsduhzuOK8cV3oCrohClZeQP0asfUV3WtuT4pmRFWlhDUa00IhibWiFY');
+         
+         function orderButtonClicked() {
+            document.getElementById("loader").style.display = "block";
+            const requestOptions = {
+               method: "GET",
+               headers: { 
+                  "Content-Type": "application/json",
+                  "X-CSRFToken": csrftoken,
+               },
+            };
+            fetch("/buy/order/", requestOptions)
+            .then(response => response.json())
+            .then(session => stripe.redirectToCheckout({ sessionId: session.session_id.id }));
+         }
+         function promoButtonClicked() {
+         const promo = document.getElementById('promo')
+         const requestOptions = {
+            method: "PATCH",
+            headers: { 
+               "Content-Type": "application/json",
+               "X-CSRFToken": csrftoken,
+            },
+            body: JSON.stringify({
+               promo_code: promo.value,
+            }),
+         };
+         fetch("/buy/order/promo", requestOptions)
+         .then(response => {
+            if (!response.ok){
+               promo.value = '';
+               promo.setAttribute('placeholder', 'Промокод не найден!');
+            }
+            else {
+               promo.style.color = 'green';
+            }
+         });
+      }
+    </script>
+{% endblock %}

@@ -14,8 +14,9 @@
 </div>
 <div class="with_button">
    <button id="order" class="order-button" disabled onclick="orderButtonClicked()">
-   Сформировать заказ
+      Оформить заказ
    </button>
+   <b style='margin-left: 12px; margin-top: 12px'>Корзина: <span id='order_count' >0</span></b>
 </div>
 <div id="loader" style="display:none;"></div>
 {% endblock %}
@@ -52,7 +53,7 @@
                      <button id="{{item.id}}"
                         onclick="saveButtonClicked( {{item.id}} )"
                         class="pricing-button"
-                     > В корзину</button>
+                     > Добавить в заказ</button>
                   </div>
                </div>
             </div>
@@ -74,54 +75,38 @@
         };
         function saveButtonClicked(id) {
         var disabled = document.getElementById(`${id}`).getAttribute('disabled');
+        var count = document.getElementById('order_count');
+        console.log(count.innerText);
         if (!disabled) {
             document.getElementById(`${id}`).setAttribute('disabled', true);
             document.getElementById("order").removeAttribute('disabled');
             orderedItems.push(id);
+            count.innerText=orderedItems.length;
         }
         };
 
         function orderButtonClicked() {
          const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-         var button = document.getElementById("order")
-         if (button.innerHTML != "Оплатить"){
-            if (confirm("Есть промокод?")) {
-            promocode = prompt("Введите промокод", "SALE20");
+         const requestOptions = {
+            method: "POST",
+            headers: { 
+               "Content-Type": "application/json",
+               "X-CSRFToken": csrftoken,
+            },
+            body: JSON.stringify({
+               order_items: orderedItems,
+            }),
+         };
+         fetch("/buy/order/", requestOptions)
+         .then(response => {
+            if (!response.ok){
+               alert('Неудалось создать заказ!')
             }
-            const requestOptions = {
-               method: "POST",
-               headers: { 
-                  "Content-Type": "application/json",
-                  "X-CSRFToken": csrftoken,
-               },
-               body: JSON.stringify({
-                  order_items: orderedItems,
-                  promo_code: promocode,
-               }),
-            };
-            fetch("/buy/order/", requestOptions)
-            .then(response => {
-               if (!response.ok){
-                  alert('Неудалось создать заказ!')
-               }
-               else {
-                  button.innerHTML = 'Оплатить';
-               }
-            });
-         }
-         else{
-            document.getElementById("loader").style.display = "block";
-            const requestOptions = {
-               method: "GET",
-               headers: { 
-                  "Content-Type": "application/json",
-                  "X-CSRFToken": csrftoken,
-               },
-            };
-            fetch("/buy/order/", requestOptions)
-            .then(response => response.json())
-            .then(session => stripe.redirectToCheckout({ sessionId: session.session_id.id }));
-         }
+            else {
+               window.location.assign('/order/');
+            }
+         });
+
         };
 
     </script>
