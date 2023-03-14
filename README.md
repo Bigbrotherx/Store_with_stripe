@@ -1,5 +1,7 @@
 # Store with "Stripe"
 
+![1678783012562](image/README/1678783012562.png)
+
 ## Ознакомится с примером можно [здесь](https://bigbrotgerx.pythonanywhere.com)
 
 * Сценарии работы:
@@ -40,10 +42,9 @@
    ```bash
    docker-compose up -в
    ```
+2. Сервер доступен в вашем web браузере по адресу:
 
-  2. Сервер доступен в вашем web браузере по адресу:
-
-      [localhost](http://localhost:8000/)
+   [localhost](http://localhost:8000/)
 
 ## Администрирование
 
